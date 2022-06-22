@@ -1,0 +1,97 @@
+#include "p18f4550.inc"
+    
+VARIAVEIS UDATA_ACS 0
+    CONT RES 1
+    BT_SW1 EQU  .6
+    BT_SW2 EQU  .7 
+
+
+RES_VECT  CODE    0x0000            ; processor reset vector
+    GOTO    START                   ; go to beginning of program
+
+    
+MAIN_PROG CODE                      ; let linker place main program
+
+ 
+START
+    MOVLW b'0'
+    MOVWF TRISD
+    BSF TRISC, BT_SW1 ;pino RD2
+    BSF TRISC, BT_SW2 ;pino RD3
+    
+LOOP
+    BTFSC PORTC, BT_SW1
+    CALL SEC1
+    BTFSC PORTC, BT_SW2
+    CALL SEC2
+GOTO LOOP
+    
+SEC1
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  
+  BTFSC PORTC, BT_SW2
+    RETURN
+  BTFSS PORTC, BT_SW1
+    RETURN
+ 
+  
+  ADDWF d'1', CONT
+  MOVLW  CONT
+  MOVWF  PORTD
+RETURN
+    
+    
+SEC2
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  CALL	    DELAY200MS
+  
+  BTFSC PORTC, BT_SW1
+    RETURN
+  BTFSS PORTC, BT_SW2
+    RETURN
+  
+  SUBWF d'1', CONT
+  MOVLW  CONT
+  MOVWF  PORTD
+RETURN
+
+DELAY200MS
+    MOVLW .200
+    MOVWF CONT2
+ 
+    DELAYM 
+	CALL	DELAY200US
+	CALL	DELAY200US
+	CALL	DELAY200US
+	CALL	DELAY200US
+	CALL	DELAY200US
+	DECFSZ CONT2 
+    BRA DELAYM
+RETURN
+    
+DELAY200US
+    MOVLW .48 
+    MOVWF CONT1
+
+    DELAY
+	NOP 
+	DECFSZ CONT1 
+    BRA DELAY
+    
+    BTFSC PORTC, BT_SW1 
+	RETURN
+    BTFSC PORTC, BT_SW2 
+	RETURN
+    
+    POP
+    POP
+RETURN
+
+END
