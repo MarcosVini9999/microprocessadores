@@ -39,7 +39,7 @@ void main(void) {
                 continue;
                 break;
             default:
-                TRISCbits.RC0=1;
+                TRISCbits.RC0 ^= 1;
                 continue;
         }
     }
